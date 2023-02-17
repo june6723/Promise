@@ -1,33 +1,94 @@
 // const MyPromise = Promise;
 
-// const SimplePromise = require('../SimplePromise');
+// const SimplePromise = require("../SimplePromise");
 // const MyPromise = SimplePromise;
-const SimpleAsyncPromise = require("../SimpleAsyncPromise");
-const MyPromise = SimpleAsyncPromise;
+// const SimpleAsyncPromise = require("../SimpleAsyncPromise");
+// const MyPromise = SimpleAsyncPromise;
+// const ChainingPromise = require("../ChainingPromise");
+// const MyPromise = ChainingPromise;
+const AsyncChainingPromise = require("../AsyncChainingPromise");
+const MyPromise = AsyncChainingPromise;
+// const MyPromise = require("../MyPromise");
 
 const DEFAULT_VALUE = "default";
 
-function promise({ value = DEFAULT_VALUE, fail = false } = {}) {
-  return new MyPromise((resolve, reject) => {
-    fail ? reject(value) : resolve(value);
-  });
-}
-const checkFunc = (v) => expect(v).toEqual(DEFAULT_VALUE);
-
-describe("Promise", () => {
-  it("Simple async resolve test", () => {
-    const asyncPm = new MyPromise((resolve, reject) => {
+describe("Promise then", () => {
+  // it("with no chaining", (done) => {
+  //   new MyPromise((resolve) => {
+  //     resolve(DEFAULT_VALUE);
+  //   }).then((v) => {
+  //     try {
+  //       expect(v).toEqual(DEFAULT_VALUE);
+  //       done();
+  //     } catch (error) {
+  //       done(error);
+  //     }
+  //   });
+  // });
+  // it("Simple async resolve test", (done) => {
+  //   new MyPromise((resolve) => {
+  //     setTimeout(() => {
+  //       resolve(DEFAULT_VALUE);
+  //     }, 100);
+  //   }).then((v) => {
+  //     try {
+  //       expect(v).toEqual(DEFAULT_VALUE);
+  //       done();
+  //     } catch (error) {
+  //       done(error);
+  //     }
+  //   });
+  // });
+  // it("with chaining", (done) => {
+  //   new MyPromise((resolve) => {
+  //     resolve(3);
+  //   })
+  //     .then((v) => v * 4)
+  //     .then((v) => {
+  //       try {
+  //         expect(v).toBe(12);
+  //         done();
+  //       } catch (error) {
+  //         done(error);
+  //       }
+  //     });
+  // });
+  it("with asynchronous chaining", (done) => {
+    new MyPromise((resolve) => {
       setTimeout(() => {
-        resolve(DEFAULT_VALUE);
-      }, 500);
-    });
-    return asyncPm.then(checkFunc);
+        resolve(3);
+      }, 100);
+    })
+      .then(
+        (v) =>
+          new MyPromise((resolve) => {
+            setTimeout(() => {
+              resolve(v * 2);
+            }, 100);
+          })
+      )
+      .then(
+        (v) =>
+          new MyPromise((resolve) => {
+            setTimeout(() => {
+              resolve(v * 2);
+            }, 100);
+          })
+      )
+      .then((v) => {
+        try {
+          expect(v).toBe(12);
+          done();
+        } catch (error) {
+          done(error);
+        }
+      });
   });
 });
+
+const pm = new Promise((res) => res(1)).catch();
+
 // describe('then', () => {
-//   it('with no chaining', () => {
-//     return promise().then(v => expect(v).toEqual(DEFAULT_VALUE));
-//   });
 
 //   it('with multiple thens for same promise', () => {
 //     const checkFunc = v => expect(v).toEqual(DEFAULT_VALUE);
@@ -45,11 +106,6 @@ describe("Promise", () => {
 //     return Promise.allSettled([resolvePromise, rejectPromise]);
 //   });
 
-//   it('with chaining', () => {
-//     return promise({ value: 3 })
-//       .then(v => v * 4)
-//       .then(v => expect(v).toEqual(12));
-//   });
 // });
 
 // describe('catch', () => {

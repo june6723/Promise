@@ -1,24 +1,21 @@
 const PromiseState = require("./PromiseState");
 
 class SimplePromise {
-  result;
-  state;
+  result = null;
+  state = PromiseState.PENDING;
   constructor(executor) {
-    this.result = null;
-    this.state = PromiseState.pending;
-
     executor(this.resolve.bind(this), this.reject.bind(this));
   }
 
   resolve(value) {
     this.result = value;
-    this.state = PromiseState.fulfilled;
+    this.state = PromiseState.FULFILLED;
 
     return this;
   }
   reject(error) {
     this.result = error;
-    this.state = PromiseState.rejected;
+    this.state = PromiseState.REJECTED;
 
     return this;
   }

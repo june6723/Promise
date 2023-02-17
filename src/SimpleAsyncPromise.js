@@ -3,16 +3,18 @@ const PromiseState = require("./PromiseState");
 class SimpleAsyncPromise {
   constructor(executor) {
     this.result = null;
-    this.state = PromiseState.pending;
+    this.state = PromiseState.PENDING;
     this.onFulfilledCallback = null;
     this.onRejectedCallback = null;
 
-    executor(this.resolve.bind(this), this.reject.bind(this));
+    queueMicrotask(() =>
+      executor(this.resolve.bind(this), this.reject.bind(this))
+    );
   }
 
   resolve(value) {
     this.result = value;
-    this.state = PromiseState.fulfilled;
+    this.state = PromiseState.FULFILLED;
 
     const onFulfilledCallback = this.onFulfilledCallback;
     if (onFulfilledCallback) onFulfilledCallback(this.result);
@@ -21,7 +23,7 @@ class SimpleAsyncPromise {
   }
   reject(error) {
     this.result = error;
-    this.state = PromiseState.rejected;
+    this.state = PromiseState.REJECTED;
 
     const onRejectedCallback = this.onRejectedCallback;
     if (onRejectedCallback) onRejectedCallback(this.result);
