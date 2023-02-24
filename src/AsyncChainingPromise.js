@@ -76,21 +76,22 @@ class AsyncChainingPromise {
       };
     });
   }
-}
+  catch(onRejected) {
+    return this.then(undefined, onRejected);
+  }
 
-new AsyncChainingPromise((resolve) => {
-  setTimeout(() => {
-    resolve(3);
-  }, 100);
-})
-  .then(
-    (v) =>
-      new AsyncChainingPromise((resolve) => {
-        setTimeout(() => {
-          resolve(v * 2);
-        }, 100);
-      })
-  )
-  .then((value) => console.log(value));
+  finally(callback) {
+    return this.then(
+      (value) => {
+        callback();
+        return value;
+      },
+      (value) => {
+        callback();
+        throw value;
+      }
+    );
+  }
+}
 
 module.exports = AsyncChainingPromise;
